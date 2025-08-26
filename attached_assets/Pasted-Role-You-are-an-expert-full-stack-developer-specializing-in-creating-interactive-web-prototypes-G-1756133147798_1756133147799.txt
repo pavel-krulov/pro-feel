@@ -1,0 +1,77 @@
+Role: You are an expert full-stack developer specializing in creating interactive web prototypes.
+
+Goal: Create a complete, runnable, and interactive prototype of a "Mission Logic" application based on the provided flow diagram. The prototype must simulate three different user roles: a Client, a Security Company Operator, and a Security Guard. The most important part is the Operator's dashboard with a real-time map.
+
+Technology Stack:
+
+Backend: Node.js with the Express framework.
+
+Real-time Engine: Socket.IO for WebSocket communication.
+
+Frontend: HTML, CSS, and modern JavaScript (ES6). Use the Leaflet.js library for the map with OpenStreetMap tiles (to avoid needing API keys).
+
+Styling: Use a clean and simple modern UI.
+
+Project Structure:
+Create a single HTML page (index.html) that uses tabs or distinct sections to simulate the three different user interfaces:
+
+Operator Dashboard
+
+Client App
+
+Guard App
+
+Core Functionality:
+
+1. Data Simulation (Backend):
+
+Do not use a database. Store all data in-memory in the Node.js server.
+
+Create an array of 5-6 "Agent" objects. Each agent should have an id, name, status (available, assigned), and random lat/lng coordinates around a central point (e.g., around Paris, France).
+
+Create an empty array to store "Mission" objects.
+
+2. Operator Dashboard View:
+
+Display a full-screen Leaflet.js map.
+
+When the page loads, display all "available" agents on the map as blue markers.
+
+When a "New Intervention" event occurs, display a new, prominent red marker on the map at the intervention's location.
+
+The operator must be able to click on an agent's marker to select them. The selected agent's marker should change color. The operator can select multiple agents.
+
+There must be an "Assign Selected Agents" button. When clicked, this should trigger a backend event.
+
+3. Client App View:
+
+A simple button labeled "Request Security". When clicked, it should generate a new mission at a random location near the agents and send an event to the backend.
+
+A status display area that shows the current state of their request (e.g., "Request Received", "Guard Assigned", "Guard On The Way", etc.).
+
+4. Guard App View:
+
+A notification area that is initially empty.
+
+When a mission is assigned to this guard, this area should display the mission details and two buttons: "Accept Mission" and "Decline Mission".
+
+5. Real-Time Reactive Flow (Socket.IO Logic):
+This is the most critical part. Implement the following event flow:
+
+Client -> Server: When the "Request Security" button is clicked in the Client view, emit a client:request_mission event to the server with random coordinates.
+
+Server -> Operator: Upon receiving client:request_mission, the server creates a new Mission object, stores it, and broadcasts a server:new_mission event to the Operator Dashboard. The dashboard then displays the new red marker.
+
+Operator -> Server: When the operator selects agents and clicks "Assign Selected Agents", emit an operator:assign_agents event with the missionId and an array of agentIds.
+
+Server -> Specific Guard(s): Upon receiving operator:assign_agents, the server should change the status of the assigned agents to "assigned". Then, for each assigned agent, emit a private server:mission_offer event to only that agent's view, containing the mission details.
+
+Guard -> Server: When an agent clicks "Accept Mission", emit an agent:accept_mission event with the missionId and agentId.
+
+Server -> Operator & Client: Upon receiving agent:accept_mission, the server should update the mission status. Then, broadcast a server:mission_status_update event to both the Operator and Client views.
+
+The Operator's map should update the agent's marker to green (for "accepted").
+
+The Client's status display should update to "Security Guard is on the way".
+
+Please ensure the final code is complete and runnable on Replit without any further configuration.
